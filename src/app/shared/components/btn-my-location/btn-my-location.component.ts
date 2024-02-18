@@ -1,4 +1,6 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
+import { MapService } from '@maps/services/map.service';
+import { PlacesService } from '@maps/services/places.service';
 
 @Component({
   selector: 'shared-btn-my-location',
@@ -9,9 +11,14 @@ import { Component, input } from '@angular/core';
 })
 export class BtnMyLocationComponent {
 
-  txtButton = input.required<string>({ alias: 'btn-text'});
+  // Dependencias del button
+  private mapService = inject(MapService);
+  private placesService = inject(PlacesService);
+  public txtButton = input.required<string>({ alias: 'btn-text' });
 
-  goToMyLocation(){
-    console.log('Go to location');
+  goToMyLocation() {
+    if (!this.placesService.userLocationComputed()) throw Error('No user location');
+    if (!this.mapService.isMapReadyComputed()) throw Error('The map is not ready');
+    this.mapService.flyTo(this.placesService.userLocationComputed()!);
   }
 }
