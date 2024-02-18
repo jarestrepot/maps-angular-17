@@ -1,7 +1,9 @@
 
 @if ( !isUserLocationReady() ) {
-
   <app-loading class="grid place-items-center w-full h-screen"/>
 }@else {
   <app-map-view/>
+  <shared-btn-my-location btn-text="My Location" />
 }
+<shared-corporate-logo altImage="Logo Angular"/>
+

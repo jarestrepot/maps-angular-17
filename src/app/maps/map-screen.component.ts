@@ -3,11 +3,13 @@ import { PlacesService } from './services/places.service';
 import { LoadingComponent } from '@shared/components/loading/loading.component';
 import { CommonModule } from '@angular/common';
 import { MapViewComponent } from './screens/map-view/map-view.component';
+import { CorporateLogoComponent } from '@shared/components/corporate-logo/corporate-logo.component';
+import { BtnMyLocationComponent } from '@shared/components/btn-my-location/btn-my-location.component';
 
 @Component({
   selector: 'shared-screen',
   standalone: true,
-  imports: [ LoadingComponent, CommonModule, MapViewComponent ],
+  imports: [LoadingComponent, CommonModule, MapViewComponent, CorporateLogoComponent, BtnMyLocationComponent ],
   templateUrl: './map-screen.component.html',
 })
 export default class MapScreenComponent {
