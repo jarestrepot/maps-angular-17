@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { Feature } from '@maps/interfaces/places.interface';
-import { LngLatLike, Map, Marker, Popup } from 'mapbox-gl';
+import { LngLatBounds, LngLatLike, Map, Marker, Popup } from 'mapbox-gl';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +42,7 @@ export class MapService {
     })
   }
 
-  createMarkersFromPlaces(places: Feature[]) {
+  createMarkersFromPlaces(places: Feature[], userLocation: [number, number]) {
     // Crear instancias del erro para saber que error es
     if (!this.mapSignal()) throw Error("Mapa no inicializado");
     this.markers.update(marker => []);
@@ -62,15 +62,27 @@ export class MapService {
       const newMarker = new Marker()
         .setLngLat([lng, lat])
         .setPopup(popup)
-        .addTo( this.mapSignal()! );
+        .addTo(this.mapSignal()!);
 
-        newMarkers.push(newMarker)
+      newMarkers.push(newMarker)
     }
 
-    this.markers.update( markers => ({
+    this.markers.update(markers => ({
       markers,
       ...newMarkers
-    }))
+    }));
+
+    if (places.length === 0) return;
+
+    // LIMITES DEL MAPA (Subir el scroll de los mapas)
+
+    const bounds = new LngLatBounds();
+    newMarkers.forEach(marker => bounds.extend(marker.getLngLat()));
+    bounds.extend( userLocation );
+
+    this.mapSignal()!.fitBounds(bounds, {
+      padding: 200
+    })
 
   }
 }

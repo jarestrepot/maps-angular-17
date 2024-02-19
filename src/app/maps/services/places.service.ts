@@ -68,7 +68,7 @@ export class PlacesService {
           next: (features) => {
             this.isLoadingPlaces.set(!this.isLoadingPlaces());
             this.placesSignal.set(features);
-            this.#mapService.createMarkersFromPlaces( this.placesSignal() )
+            this.#mapService.createMarkersFromPlaces(this.placesSignal(), this.userLocationComputed()! )
           }
         }
       )
