@@ -22,7 +22,7 @@ export class SearchBarComponent {
 
     this.#debounceTime = setTimeout(() => {
 
-      this.#placesSerive.getPlacesByQuery( query )
+      this.#placesSerive.getPlacesByQuery(query)
     }, 400);
 
   }

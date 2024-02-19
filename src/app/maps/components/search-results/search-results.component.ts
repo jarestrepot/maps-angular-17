@@ -1,14 +1,29 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { Feature } from '@maps/interfaces/places.interface';
+import { MapService } from '@maps/services/map.service';
+import { PlacesService } from '@maps/services/places.service';
 import { BtnCustomComponent } from '@shared/components/btn-custom/btn-custom.component';
 
 @Component({
   selector: 'maps-search-results',
   standalone: true,
-  imports: [CommonModule, BtnCustomComponent ],
+  imports: [CommonModule, BtnCustomComponent],
   templateUrl: './search-results.component.html',
   styles: ``
 })
 export class SearchResultsComponent {
+
+  public selectedId = signal<string>('');
+  #placesSerive = inject(PlacesService);
+  #mapService = inject(MapService);
+  public isLoadingPLacesComputed = computed(() => this.#placesSerive.isLoadingPlaces());
+  public placesComputed = computed(() => this.#placesSerive.placesSignal());
+
+  flyTo(place: Feature) {
+    this.selectedId.set(place.id);
+    const [lng, lat] = place.center;
+    this.#mapService.flyTo([lng, lat])
+  }
 
 }

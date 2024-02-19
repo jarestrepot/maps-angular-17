@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { PlacesApiClient } from '@maps/api/placesApiClient';
 import { Feature, PlacesResponse } from '@maps/interfaces/places.interface';
 import { map } from 'rxjs';
+import { MapService } from './map.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,7 @@ export class PlacesService {
 
   private placesApi = inject(PlacesApiClient);
   private userLocation = signal<[number, number] | undefined>(undefined);
+  #mapService = inject( MapService );
   public isLoadingPlaces = signal<boolean>(false);
   public placesSignal = signal<Feature[]>([]);
 
@@ -42,6 +44,12 @@ export class PlacesService {
 
   getPlacesByQuery(query: string = '') {
 
+    if( query.length === 0 ){
+      this.isLoadingPlaces.set( false );
+      this.placesSignal.set([]);
+      return;
+    }
+
     // TODO: Empty string
     if (!this.userLocation()) throw Error('No se pudo obtener la geolocalización');
 
@@ -60,6 +68,7 @@ export class PlacesService {
           next: (features) => {
             this.isLoadingPlaces.set(!this.isLoadingPlaces());
             this.placesSignal.set(features);
+            this.#mapService.createMarkersFromPlaces( this.placesSignal() )
           }
         }
       )
