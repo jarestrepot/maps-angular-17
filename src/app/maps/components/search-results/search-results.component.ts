@@ -26,4 +26,14 @@ export class SearchResultsComponent {
     this.#mapService.flyTo([lng, lat])
   }
 
+  getDirections( place: Feature) {
+
+    if( !this.#placesSerive.userLocationComputed() ) throw Error('Not found user location');
+
+    const start = this.#placesSerive.userLocationComputed()!;
+    const end = place.center as [number, number];
+
+    this.#mapService.getRouteBetweenPoints( start, end )
+  }
+
 }

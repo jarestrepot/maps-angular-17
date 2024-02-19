@@ -1,4 +1,6 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { DirectionsApiClient } from '@maps/api/directionsApiClient';
+import { DirectionsResponse, Route } from '@maps/interfaces/directions.interface';
 import { Feature } from '@maps/interfaces/places.interface';
 import { LngLatBounds, LngLatLike, Map, Marker, Popup } from 'mapbox-gl';
 
@@ -10,6 +12,7 @@ export class MapService {
   // Whit Signals
   private mapSignal = signal<Map | undefined>(undefined);
   private markers = signal<Marker[]>([]);
+  private directionsApi = inject(DirectionsApiClient);
 
   public isMapReadyComputed = computed(() => {
     return !!this.mapSignal();
@@ -78,11 +81,36 @@ export class MapService {
 
     const bounds = new LngLatBounds();
     newMarkers.forEach(marker => bounds.extend(marker.getLngLat()));
-    bounds.extend( userLocation );
+    bounds.extend(userLocation);
 
     this.mapSignal()!.fitBounds(bounds, {
       padding: 200
-    })
+    });
 
+  }
+
+  getRouteBetweenPoints(start: [number, number], end: [number, number]) {
+    this.directionsApi.get<DirectionsResponse>(`/${start.join(',')};${end.join(',')}`)
+      .subscribe(({ routes }) => this.drawPolyLine(routes[0]))
+  }
+
+  private drawPolyLine({ geometry, distance, duration }: Route) {
+    console.log({ distance: distance / 1000, duration: duration / 60 })
+
+    const [start, end] = geometry.coordinates as [[number, number], [number, number]];
+    const coords = geometry.coordinates;
+
+
+    const bounds = new LngLatBounds();
+    coords.forEach( ([lng, lat]) => {
+      bounds.extend([ lng, lat ]);
+    });
+
+    this.mapSignal()!.fitBounds(bounds, {
+      padding: 200
+    });
+
+    //LineString
+    
   }
 }

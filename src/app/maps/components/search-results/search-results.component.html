@@ -15,7 +15,7 @@
       <p class="text-base leading-normal tracking-normal text-gray-700 font-normal">
         {{ place.place_name }}
       </p>
-      <shared-btn-custom textBtn="Addresses" />
+      <shared-btn-custom (emitClick)="getDirections( place )" textBtn="Addresses" />
     </li>
   </ul>
 
