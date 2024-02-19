@@ -1,16 +1,21 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { PlacesApiClient } from '@maps/api/placesApiClient';
+import { Feature, PlacesResponse } from '@maps/interfaces/places.interface';
+import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlacesService {
 
-
+  private placesApi = inject(PlacesApiClient);
   private userLocation = signal<[number, number] | undefined>(undefined);
+  public isLoadingPlaces = signal<boolean>(false);
+  public placesSignal = signal<Feature[]>([]);
 
-  public userLocationComputed = computed( () => this.userLocation());
+  public userLocationComputed = computed(() => this.userLocation());
 
-  public isUserLocationReadyComputed = computed( () =>{
+  public isUserLocationReadyComputed = computed(() => {
     return !!this.userLocation();
   });
 
@@ -33,6 +38,31 @@ export class PlacesService {
         }
       )
     });
+  }
+
+  getPlacesByQuery(query: string = '') {
+
+    // TODO: Empty string
+    if (!this.userLocation()) throw Error('No se pudo obtener la geolocalización');
+
+    this.isLoadingPlaces.set(!this.isLoadingPlaces());
+    const url: string = `/${query}.json`;
+
+    return this.placesApi.get<PlacesResponse>(url, {
+      params: {
+        proximyty: this.userLocation()!.join(',')
+      }
+    })
+      .pipe(
+        map(response => response.features)
+      ).subscribe(
+        {
+          next: (features) => {
+            this.isLoadingPlaces.set(!this.isLoadingPlaces());
+            this.placesSignal.set(features);
+          }
+        }
+      )
   }
 
 }
