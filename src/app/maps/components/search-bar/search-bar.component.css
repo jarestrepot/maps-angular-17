@@ -10,14 +10,8 @@
   padding: .4rem;
 }
 
-.search-container input.form-control:focus {
-  outline: none;
-  /* Quita el borde de enfoque */
-  /* border: 1.5px solid rgb(6, 176, 243); */
-}
+
 .search-container::-webkit-scrollbar{
   width: .5rem;
 }
-input {
-  border-bottom: 1.5px solid rgba(0, 94, 76, 0.5);
-}
+
